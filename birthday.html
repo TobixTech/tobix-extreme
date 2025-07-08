@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday - To My Amazing Brother!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --primary: #3b82f6;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --primary-gradient: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            --gold-gradient: linear-gradient(135deg, #ffd700, #daa520);
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background: #0f172a;
+            color: white;
+        }
+        
+        .handwritten {
+            font-family: 'Pacifico', cursive;
+        }
+        
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .letter {
+            transform: rotateY(0deg);
+            transform-style: preserve-3d;
+            transition: transform 1s ease;
+            perspective: 1000px;
+        }
+        
+        .letter.open {
+            transform: rotateY(180deg);
+        }
+        
+        .letter-front, .letter-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            padding: 2rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .letter-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #1e3a8a, #172554);
+        }
+        
+        .gallery-container {
+            perspective: 1000px;
+        }
+        
+        .gallery-slide {
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+        
+        .gallery-image {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 15px;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+        }
+        
+        .gallery-image:hover {
+            transform: translateY(-10px) scale(1.03);
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+        }
+        
+        #toggleSound {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        #toggleSound:hover {
+            background: var(--accent);
+            transform: scale(1.1);
+        }
+        
+        .wish-counter {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(5px);
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .year-bubble {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+        
+        .timeline-text {
+            flex: 1;
+            text-align: left;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .letter {
+                width: 90% !important;
+            }
+            .timeline-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .timeline-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Background Canvas -->
+    <div id="canvas-container"></div>
+    
+    <!-- Birthday Content -->
+    <div class="min-h-screen flex flex-col items-center justify-center px-4 py-20">
+        <!-- Header -->
+        <header class="text-center mb-10 relative z-10">
+            <h1 class="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-yellow-300 to-yellow-500 mb-4">
+                Happy Birthday
+            </h1>
+            <h2 class="text-3xl md:text-5xl font-semibold text-white mb-6">To My Amazing Brother!</h2>
+            <div class="w-24 h-1 bg-gradient-to-r from-yellow-300 via-blue-400 to-gray-200 mx-auto my-6 rounded-full"></div>
+        </header>
+        
+        <!-- 3D Letter -->
+        <div class="relative w-4/5 max-w-2xl h-96 mb-20 mx-auto cursor-pointer letter" onclick="this.classList.toggle('open')">
+            <div class="letter-front bg-gradient-to-r from-blue-500 to-blue-300 shadow-[0_0_30px_rgba(59,130,246,0.6)] rounded-lg">
+                <h3 class="text-2xl md:text-3xl handwritten text-center text-white mb-4">Click to Open</h3>
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a4837ab9-0b96-4e3c-9443-22a2825fb503.png" alt="Golden sealed letter with 'To My Brother' written in elegant cursive script with a red wax seal" class="mx-auto w-3/4 opacity-90" />
+            </div>
+            <div class="letter-back">
+                <div class="text-white text-lg md:text-xl handwritten leading-relaxed">
+                    <p class="mb-4">Dear Brother,</p>
+                    <p class="mb-4">On this special day, I want to remind you how much you mean to me. You've been my guide, my support, and my best friend throughout life's journey.</p>
+                    <p class="mb-4">Your strength, wisdom, and kindness inspire me every day. May this year bring you endless joy, success, and happiness beyond measure.</p>
+                    <div class="wishes-container my-6">
+                        <p class="text-2xl text-center font-bold text-yellow-300 drop-shadow-[0_0_5px_rgba(255,215,0,0.6)]">Happy Birthday!</p>
+                        <div class="text-center mt-4 space-y-2">
+                            <p class="text-yellow-200">May your year be filled with success!</p>
+                            <p class="text-blue-200">Health and happiness always!</p>
+                            <p class="text-purple-200">All your dreams come true!</p>
+                        </div>
+                    </div>
+                    <p class="text-right">With all my love,</p>
+                    <p class="text-right">Your Sibling</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Video Message Section -->
+        <section class="w-full max-w-4xl mx-auto mb-20 text-center">
+            <h3 class="text-2xl md:text-3xl font-semibold mb-8 text-white">A Special Video for You</h3>
+            <div class="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden">
+                <div id="video-placeholder" class="w-full h-full flex items-center justify-center cursor-pointer bg-gray-900" onclick="playVideo()">
+                    <div class="text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="mt-2 text-xl text-white">Click to play your birthday video</p>
+                    </div>
+                </div>
+                <video id="birthday-video" class="w-full hidden" controls>
+                    <!-- You can add your video source here -->
+                    <source src="https://streamable.com/uggen5" type="video/mp4">
+                </video>
+            </div>
+        </section>
+
+        <!-- 3D Image Gallery -->
+        <section class="w-full max-w-6xl mx-auto mb-20 gallery-container">
+            <h3 class="text-2xl md:text-3xl font-semibold text-center mb-10 text-white">Our Special Moments</h3>
+            <div class="relative h-96">
+                <div class="gallery-slide absolute inset-0 flex items-center justify-center" id="gallery">
+                    <!-- Gallery items will be added dynamically -->
+                    <div class="absolute gallery-image w-3/4 md:w-1/2 h-3/4 bg-white rounded-lg overflow-hidden" data-index="0">
+                        <img src="https://i.imghippo.com/files/neDu8493i.jpg" alt="Brothers smiling together at a family gathering with arms around each other's shoulders" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="absolute gallery-image w-3/4 md:w-1/2 h-3/4 bg-white rounded-lg overflow-hidden" data-index="1">
+                        <img src="https://i.imghippo.com/files/hxMf1868RnA.jpg" alt="Childhood photo of two brothers playing together in a park with sunny background" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="absolute gallery-image w-3/4 md:w-1/2 h-3/4 bg-white rounded-lg overflow-hidden" data-index="2">
+                        <img src="https://i.imghippo.com/files/WjtC6943Wy.jpg" alt="Celebrating a special occasion at an outdoor restaurant with city lights in the background" class="w-full h-full object-cover" />
+                    </div>
+                </div>
+                <button id="prevBtn" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 p-3 rounded-full backdrop-blur-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button id="nextBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 p-3 rounded-full backdrop-blur-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex justify-center mt-6 gap-2" id="gallery-dots">
+                <!-- Dots will be added dynamically -->
+            </div>
+        </section>
+        
+        <!-- Timeline Section -->
+        <section class="w-full max-w-4xl mx-auto mb-12">
+            <h3 class="text-2xl md:text-3xl font-semibold text-center mb-8 text-white">Our Journey Together</h3>
+            <div class="timeline space-y-8">
+                <div class="timeline-item">
+                    <div class="year-bubble bg-yellow-400 text-gray-900">2005</div>
+                    <p class="timeline-text">The year you became my best friend</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="year-bubble bg-blue-400">2012</div>
+                    <p class="timeline-text">Our first big adventure together</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="year-bubble bg-purple-400">2020</div>
+                    <p class="timeline-text">When you helped me through tough times</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Message -->
+        <div class="text-center max-w-3xl mx-auto mb-20">
+            <p class="text-xl md:text-2xl handwritten text-white mb-6">
+                May your special day be as wonderful as you've made my life by being in it.
+            </p>
+            <div class="w-16 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto my-6 rounded-full"></div>
+            <p class="text-sm text-gray-300">
+                Powered by <span class="text-yellow-300 font-medium">Tobix Technology</span> with Love
+            </p>
+        </div>
+    </div>
+    
+    <!-- Sound Toggle -->
+    <button id="toggleSound">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 015.657 2.343m0 0a7.975 7.975 0 010 11.314m-11.314 0a7.975 7.975 0 010-11.314m0 0a7.975 7.975 0 015.657-2.343" />
+        </svg>
+    </button>
+    
+    <!-- JavaScript -->
+    <script>
+        // 3D Background
+        let scene, camera, renderer, particles;
+        
+        function initScene() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            // Create particles
+            const particleCount = 1000;
+            const particlesGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 2000;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+                
+                colors[i * 3] = Math.random() * 0.5 + 0.5;
+                colors[i * 3 + 1] = Math.random() * 0.5 + 0.5;
+                colors[i * 3 + 2] = Math.random() * 0.5 + 0.5;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 3,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+            
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+            
+            // Add some 3D shapes
+            const geometry = new THREE.IcosahedronGeometry(30, 0);
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x3b82f6,
+                emissive: 0x072534,
+                side: THREE.DoubleSide,
+                flatShading: true,
+                transparent: true,
+                opacity: 0.3
+            });
+            
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // Position camera
+            camera.position.z = 100;
+            
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particles.rotation.x += 0.0002;
+                particles.rotation.y += 0.0003;
+                mesh.rotation.x += 0.005;
+                mesh.rotation.y += 0.008;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Handle resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            
+            // Make particles interactive
+            document.addEventListener('mousemove', (e) => {
+                const mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                const mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+                
+                gsap.to(particles.rotation, {
+                    x: mouseY * 0.3,
+                    y: mouseX * 0.3,
+                    duration: 2,
+                    ease: "power2.out"
+                });
+                
+                gsap.to(mesh.rotation, {
+                    x: mouseY * 0.1,
+                    y: mouseX * 0.1,
+                    duration: 3,
+                    ease: "power2.out"
+                });
+            });
+        }
+        
+        // Image Gallery
+        function initGallery() {
+            const gallery = document.getElementById('gallery');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const galleryDots = document.getElementById('gallery-dots');
+            const slides = Array.from(document.querySelectorAll('.gallery-image'));
+            const slideCount = slides.length;
+            let currentIndex = 0;
+            
+            // Create dots
+            slides.forEach((slide, index) => {
+                const dot = document.createElement('div');
+                dot.className = `w-3 h-3 rounded-full cursor-pointer ${index === 0 ? 'bg-blue-400' : 'bg-gray-400'}`;
+                dot.addEventListener('click', () => {
+                    goToSlide(index);
+                });
+                galleryDots.appendChild(dot);
+            });
+            
+            function updateGallery() {
+                const angle = 360 / slideCount;
+                
+                slides.forEach((slide, index) => {
+                    const position = (index - currentIndex) % slideCount;
+                    const adjustedPosition = position < 0 ? position + slideCount : position;
+                    
+                    const angleRad = adjustedPosition * angle * (Math.PI / 180);
+                    const distance = 300;
+                    const z = Math.cos(angleRad) * distance;
+                    const x = Math.sin(angleRad) * distance;
+                    
+                    gsap.to(slide, {
+                        x: x,
+                        z: -z,
+                        scale: index === currentIndex ? 1 : 0.8,
+                        opacity: index === currentIndex ? 1 : 0.6,
+                        duration: 0.5
+                    });
+                    
+                    // Update active dot
+                    galleryDots.children[index].className = 
+                        `w-3 h-3 rounded-full cursor-pointer ${index === currentIndex ? 'bg-blue-400' : 'bg-gray-400'}`;
+                });
+            }
+            
+            function goToSlide(index) {
+                currentIndex = index;
+                updateGallery();
+            }
+            
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % slideCount;
+                updateGallery();
+            }
+            
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + slideCount) % slideCount;
+                updateGallery();
+            }
+            
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            
+            // Set initial positions
+            updateGallery();
+            
+            // Auto-rotate
+            let autoRotateInterval = setInterval(nextSlide, 5000);
+            
+            // Pause on hover
+            gallery.addEventListener('mouseenter', () => {
+                clearInterval(autoRotateInterval);
+            });
+            
+            gallery.addEventListener('mouseleave', () => {
+                autoRotateInterval = setInterval(nextSlide, 5000);
+            });
+            
+            // Touch events for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            gallery.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            gallery.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                if (touchEndX < touchStartX - 50) nextSlide();
+                if (touchEndX > touchStartX + 50) prevSlide();
+            }
+        }
+        
+        // Confetti Effect
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#48dbfb', '#feca57', '#a55eea', '#20c997'];
+            const container = document.body;
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * window.innerWidth + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                container.appendChild(confetti);
+                
+                const animationDuration = Math.random() * 3 + 2;
+                
+                gsap.to(confetti, {
+                    y: window.innerHeight + 100,
+                    x: '+=100',
+                    rotation: Math.random() * 360,
+                    opacity: 1,
+                    duration: animationDuration,
+                    ease: "power1.out",
+                    onComplete: () => {
+                        confetti.remove();
+                    }
+                });
+            }
+        }
+        
+        // Sound Manager
+        function initSound() {
+            const toggleBtn = document.getElementById('toggleSound');
+            let audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-happy-birthday-to-you-886.mp3');
+            audio.loop = true;
+            let isPlaying = false;
+            
+            toggleBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    audio.pause();
+                    toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6a7.975 7.975 0 015.657 2.343m0 0a7.975 7.975 0 010 11.314m-11.314 0a7.975 7.975 0 010-11.314m0 0a7.975 7.975 0 015.657-2.343" /></svg>';
+                } else {
+                    audio.play();
+                    toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>';
+                    createConfetti();
+                }
+                isPlaying = !isPlaying;
+            });
+        }
+        
+        // Wish Counter Functionality
+        function initWishCounter() {
+            let count = 0;
+            const counter = document.getElementById('wishCounter');
+            const btn = document.getElementById('addWishBtn');
+            
+            btn.addEventListener('click', () => {
+                count++;
+                counter.textContent = count;
+                
+                // Add confetti effect when reaching milestones
+                if (count % 5 === 0) {
+                    createConfetti();
+                }
+                
+                // Animation
+                gsap.to(counter, {
+                    scale: 1.5,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1
+                });
+            });
+        }
+
+        // Video Player Functionality
+        function playVideo() {
+            const placeholder = document.getElementById('video-placeholder');
+            const video = document.getElementById('birthday-video');
+            
+            placeholder.classList.add('hidden');
+            video.classList.remove('hidden');
+            video.play();
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initScene();
+            initGallery();
+            initSound();
+            
+            // Animate letter opening on load
+            setTimeout(() => {
+                document.querySelector('.letter').classList.add('open');
+                setTimeout(() => {
+                    document.querySelector('.letter').classList.remove('open');
+                }, 3000);
+            }, 1000);
+            
+            // Add some 3D hover effects to headings
+            const headings = document.querySelectorAll('h1, h2, h3');
+            headings.forEach(heading => {
+                heading.addEventListener('mousemove', (e) => {
+                    const rect = heading.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const angleX = (y - centerY) / 10;
+                    const angleY = (centerX - x) / 10;
+                    
+                    heading.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg)`;
+                });
+                
+                heading.addEventListener('mouseleave', () => {
+                    heading.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
