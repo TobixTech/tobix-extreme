@@ -45,6 +45,11 @@
             transform-style: preserve-3d;
             transition: transform 1s ease;
             perspective: 1000px;
+            position: relative;
+            width: 80%;
+            max-width: 800px;
+            height: 500px;
+            margin: 0 auto;
         }
         
         .letter.open {
@@ -62,13 +67,22 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            overflow: hidden;
+        }
+        
+        .letter-front {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
         }
         
         .letter-back {
             transform: rotateY(180deg);
             background: linear-gradient(135deg, #1e3a8a, #172554);
+            box-shadow: 0 0 30px rgba(30, 58, 138, 0.6);
+            overflow-y: auto;
         }
         
+        /* Rest of your CSS remains the same */
         .gallery-container {
             perspective: 1000px;
         }
@@ -155,6 +169,7 @@
         @media (max-width: 768px) {
             .letter {
                 width: 90% !important;
+                height: 400px;
             }
             .timeline-item {
                 flex-direction: column;
@@ -181,14 +196,16 @@
             <div class="w-24 h-1 bg-gradient-to-r from-yellow-300 via-blue-400 to-gray-200 mx-auto my-6 rounded-full"></div>
         </header>
         
-        <!-- 3D Letter -->
-        <div class="relative w-4/5 max-w-2xl h-96 mb-20 mx-auto cursor-pointer letter" onclick="this.classList.toggle('open')">
-            <div class="letter-front bg-gradient-to-r from-blue-500 to-blue-300 shadow-[0_0_30px_rgba(59,130,246,0.6)] rounded-lg">
+        <!-- 3D Letter - Fixed Version -->
+        <div class="letter" onclick="this.classList.toggle('open')">
+            <div class="letter-front">
                 <h3 class="text-2xl md:text-3xl handwritten text-center text-white mb-4">Click to Open</h3>
-                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a4837ab9-0b96-4e3c-9443-22a2825fb503.png" alt="Golden sealed letter with 'To My Brother' written in elegant cursive script with a red wax seal" class="mx-auto w-3/4 opacity-90" />
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a4837ab9-0b96-4e3c-9443-22a2825fb503.png" 
+                     alt="Golden sealed letter" 
+                     class="mx-auto w-3/4 opacity-90" />
             </div>
             <div class="letter-back">
-                <div class="text-white text-lg md:text-xl handwritten leading-relaxed">
+                <div class="text-white text-lg md:text-xl handwritten leading-relaxed p-4">
                     <p class="mb-4">Dear Brother,</p>
                     <p class="mb-4">On this special day, I want to remind you how much you mean to me. You've been my guide, my support, and my best friend throughout life's journey.</p>
                     <p class="mb-4">Your strength, wisdom, and kindness inspire me every day. May this year bring you endless joy, success, and happiness beyond measure.</p>
@@ -206,26 +223,7 @@
             </div>
         </div>
         
-        <!-- Video Message Section -->
-      <!--  <section class="w-full max-w-4xl mx-auto mb-20 text-center">
-            <h3 class="text-2xl md:text-3xl font-semibold mb-8 text-white">A Special Video for You</h3>
-            <div class="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden">
-                <div id="video-placeholder" class="w-full h-full flex items-center justify-center cursor-pointer bg-gray-900" onclick="playVideo()">
-                    <div class="text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p class="mt-2 text-xl text-white">Click to play your birthday video</p>
-                    </div>
-                </div>
-                <video id="birthday-video" class="w-full hidden" controls>
-                     You can add your video source here 
-                    <source src="https://streamable.com/uggen5" type="video/mp4">
-                </video>
-            </div>
-        </section> -->
-
+        <!-- Rest of your HTML content remains the same -->
         <!-- 3D Image Gallery -->
         <section class="w-full max-w-6xl mx-auto mb-20 gallery-container">
             <h3 class="text-2xl md:text-3xl font-semibold text-center mb-10 text-white">Our Special Moments</h3>
@@ -552,41 +550,6 @@
             });
         }
         
-        // Wish Counter Functionality
-        function initWishCounter() {
-            let count = 0;
-            const counter = document.getElementById('wishCounter');
-            const btn = document.getElementById('addWishBtn');
-            
-            btn.addEventListener('click', () => {
-                count++;
-                counter.textContent = count;
-                
-                // Add confetti effect when reaching milestones
-                if (count % 5 === 0) {
-                    createConfetti();
-                }
-                
-                // Animation
-                gsap.to(counter, {
-                    scale: 1.5,
-                    duration: 0.3,
-                    yoyo: true,
-                    repeat: 1
-                });
-            });
-        }
-
-        // Video Player Functionality
-        function playVideo() {
-            const placeholder = document.getElementById('video-placeholder');
-            const video = document.getElementById('birthday-video');
-            
-            placeholder.classList.add('hidden');
-            video.classList.remove('hidden');
-            video.play();
-        }
-
         // Initialize everything when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             initScene();
@@ -625,4 +588,3 @@
     </script>
 </body>
 </html>
-
